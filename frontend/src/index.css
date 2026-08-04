@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+@theme {
+  --color-inverse-surface: #2e3132;
+  --color-surface-dim: #d8dadb;
+  --color-surface: #f8fafb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f5;
+  --color-surface-container: #eceeef;
+  --color-surface-container-high: #e6e8e9;
+  --color-surface-container-highest: #e1e3e4;
+  --color-surface-bright: #f8fafb;
+  --color-surface-variant: #e1e3e4;
+  --color-background: #f8fafb;
+  --color-inverse-primary: #a8cbe4;
+  --color-primary: #001d2c;
+  --color-primary-container: #0c3347;
+  --color-primary-fixed: #c6e7ff;
+  --color-primary-fixed-dim: #a8cbe4;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #7a9cb3;
+  --color-on-primary-fixed: #001e2d;
+  --color-on-primary-fixed-variant: #284a5f;
+  --color-secondary: #006a6a;
+  --color-secondary-container: #91efef;
+  --color-secondary-fixed: #94f2f2;
+  --color-secondary-fixed-dim: #77d6d5;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #006e6e;
+  --color-on-secondary-fixed: #002020;
+  --color-on-secondary-fixed-variant: #004f50;
+  --color-tertiary: #001f1f;
+  --color-tertiary-container: #003636;
+  --color-tertiary-fixed: #aceeee;
+  --color-tertiary-fixed-dim: #90d2d1;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #61a2a2;
+  --color-on-tertiary-fixed: #002020;
+  --color-on-tertiary-fixed-variant: #004f50;
+  --color-deep-teal: #064747;
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-on-background: #191c1d;
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #42474c;
+  --color-inverse-on-surface: #eff1f2;
+  --color-outline: #72787d;
+  --color-outline-variant: #c2c7cd;
+  --color-surface-tint: #416278;
+  --color-status-info: #3182ce;
+  --color-text-main: #1a202c;
+  --color-border-subtle: #e2e8f0;
+
+  --font-headline: "Hanken Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+
+  --text-label-md: 14px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.05em;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-headline-md: 24px;
+  --text-headline-md--line-height: 32px;
+  --text-headline-lg: 32px;
+  --text-headline-lg--line-height: 40px;
+  --text-headline-xl: 40px;
+  --text-headline-xl--line-height: 48px;
+
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.tonal-layer-1 {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.sidebar-accent {
+  border-left: 3px solid #0c3347;
+}

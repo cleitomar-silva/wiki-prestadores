@@ -1,1 +1,1 @@
-# wiki-prestadores
+docker compose up -d --build
