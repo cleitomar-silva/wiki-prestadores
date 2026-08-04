@@ -23,11 +23,20 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        if (! $user->is_active) {
+            Auth::logout();
+
+            return response()->json([
+                'message' => 'Usuário bloqueado. Contate o administrador.',
+            ], 403);
+        }
+
         return response()->json([
             'data' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
+                'role' => $user->effectiveRole(),
             ],
         ]);
     }

@@ -27,7 +27,8 @@ function Login() {
         return
       }
 
-      setError('E-mail ou senha inválidos.')
+      const payload = await response.json().catch(() => ({}))
+      setError(payload.message || 'E-mail ou senha inválidos.')
     } catch {
       setError('Não foi possível conectar ao servidor.')
     } finally {
@@ -86,7 +87,7 @@ function Login() {
                   Senha
                 </label>
                 <a className="text-label-md font-semibold text-secondary hover:text-deep-teal transition-colors" href="#">
-                  Esqueceu a senha?
+                  {/* Esqueceu a senha? */}
                 </a>
               </div>
               <input
@@ -116,6 +117,7 @@ function Login() {
             </button>
           </form>
 
+          {/*
           <div className="relative py-4 flex items-center">
             <div className="flex-grow border-t border-border-subtle"></div>
             <span className="flex-shrink mx-4 text-on-surface-variant text-body-sm">ou</span>
@@ -134,10 +136,11 @@ function Login() {
             </svg>
             Continuar com Microsoft
           </button>
+          */}
         </div>
 
         <div className="bg-surface-container-low px-stack-lg py-4 border-t border-border-subtle flex justify-center gap-4">
-          <a className="text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">
+          <a className="text-body-sm text-on-surface-variant hover:text-primary transition-colors" target='_blank' href="https://protocolo.cafazonline.org.br/">
             Central de Ajuda
           </a>   
         </div>

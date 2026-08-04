@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { canManageUsers } from '../utils/permissions'
 
 function TopNavBar({ user, onLogout }) {
   const navigate = useNavigate()
@@ -48,8 +49,10 @@ function SideNavBar({ user, onLogout }) {
     { icon: 'manage_search', label: 'Consultar', to: '/' },
     { icon: 'add_circle', label: 'Novo', to: '/novo-procedimento' },
     { icon: 'medical_services', label: 'Procedimentos', to: '/procedimentos' },
-    { icon: 'person', label: 'Perfil' },
-    { icon: 'group', label: 'Usuários', to: '/usuarios' },
+    { icon: 'person', label: 'Perfil', to: '/perfil' },
+    ...(canManageUsers()
+      ? [{ icon: 'group', label: 'Usuários', to: '/usuarios' }]
+      : []),
   ]
 
   return (

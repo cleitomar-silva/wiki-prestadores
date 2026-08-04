@@ -1,10 +1,4 @@
-FROM composer:2 AS build
-
-WORKDIR /app
-
-COPY . .
-
-RUN composer install --no-dev --prefer-dist --no-progress --no-interaction
+FROM composer:2 AS composer
 
 FROM php:8.3-apache
 
@@ -12,9 +6,11 @@ RUN docker-php-ext-install pdo_mysql \
     && a2enmod rewrite \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
+COPY --from=composer /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
-COPY --from=build /app/ /var/www/html/
+COPY . /var/www/html/
 
 COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint

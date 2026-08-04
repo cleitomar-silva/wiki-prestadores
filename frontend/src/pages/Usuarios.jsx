@@ -1,37 +1,17 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import AppLayout from '../components/AppLayout'
 import Toast from '../components/Toast'
-
-function roleLabel(role) {
-  if (!role) return 'Padrão'
-  const labels = {
-    admin: 'Administrador',
-    administrador: 'Administrador',
-    'agente master': 'Agente Master',
-    'agente operacional': 'Agente Operacional',
-    'editor wiki': 'Editor Wiki',
-    agente: 'Agente',
-  }
-  return labels[role.toLowerCase()] ?? 'Padrão'
-}
-
-function roleStyle(role) {
-  if (!role) return 'bg-surface-variant text-on-surface-variant'
-  const r = role.toLowerCase()
-  if (r === 'admin' || r === 'administrador')
-    return 'bg-primary-container text-on-primary-container'
-  if (r === 'agente master')
-    return 'bg-secondary-container text-on-secondary-container'
-  if (r === 'editor wiki') return 'bg-surface-variant text-on-surface-variant'
-  return 'bg-secondary-container text-on-secondary-container'
-}
+import { canExclude, isActiveLabel, isActiveStyle, roleLabel, roleStyle } from '../utils/permissions'
 
 function Usuarios() {
+  const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [term, setTerm] = useState('')
   const [roleFilter, setRoleFilter] = useState('todos')
+  const [statusFilter, setStatusFilter] = useState('todos')
   const [page, setPage] = useState(1)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleting, setDeleting] = useState(false)
@@ -70,15 +50,14 @@ function Usuarios() {
       !q ||
       u.name.toLowerCase().includes(q) ||
       u.email.toLowerCase().includes(q)
-    const role = (u.role || 'padrao').toLowerCase()
+    const role = (u.role || 'colaborador').toLowerCase()
     const matchesRole =
-      roleFilter === 'todos' ||
-      roleFilter === 'administrador'
-        ? roleFilter === 'administrador'
-          ? role === 'admin' || role === 'administrador'
-          : true
-        : role === roleFilter.toLowerCase()
-    return matchesTerm && matchesRole
+      roleFilter === 'todos' || role === roleFilter.toLowerCase()
+    const matchesStatus =
+      statusFilter === 'todos' ||
+      (statusFilter === 'ativos' && u.is_active) ||
+      (statusFilter === 'bloqueados' && !u.is_active)
+    return matchesTerm && matchesRole && matchesStatus
   })
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
@@ -129,6 +108,7 @@ function Usuarios() {
           </div>
           <button
             type="button"
+            onClick={() => navigate('/novo-usuario')}
             className="bg-primary-container text-on-primary hover:opacity-90 transition-opacity flex items-center gap-2 px-6 py-3 rounded-lg text-label-md font-semibold shadow-sm cursor-pointer"
           >
             <span className="material-symbols-outlined text-sm">add</span>
@@ -153,30 +133,41 @@ function Usuarios() {
                 type="text"
               />
             </div>
-            <div className="flex items-center gap-stack-md">
-              <span className="text-label-md text-on-surface-variant">
-                Permissões:
-              </span>
-              <div className="flex gap-2">
-                {['todos', 'administrador', 'agente'].map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    onClick={() => {
-                      setRoleFilter(r)
-                      setPage(1)
-                    }}
-                    className={`px-4 py-2 rounded text-body-sm font-medium cursor-pointer transition-colors ${
-                      roleFilter === r
-                        ? 'bg-primary text-on-primary'
-                        : 'border border-outline-variant hover:bg-surface-container'
-                    }`}
-                  >
-                    {r === 'todos'
-                      ? 'Todos'
-                      : r.charAt(0).toUpperCase() + r.slice(1)}
-                  </button>
-                ))}
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <span className="text-label-md text-on-surface-variant">
+                  Permissão:
+                </span>
+                <select
+                  value={roleFilter}
+                  onChange={(e) => {
+                    setRoleFilter(e.target.value)
+                    setPage(1)
+                  }}
+                  className="px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded text-body-sm focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer transition-all"
+                >
+                  <option value="todos">Todos</option>
+                  <option value="administrador">Administrador</option>
+                  <option value="gestor">Gestor</option>
+                  <option value="colaborador">Colaborador</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-label-md text-on-surface-variant">
+                  Status:
+                </span>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value)
+                    setPage(1)
+                  }}
+                  className="px-3 py-2 bg-surface-container-lowest border border-outline-variant rounded text-body-sm focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer transition-all"
+                >
+                  <option value="todos">Ativos e Bloqueados</option>
+                  <option value="ativos">Ativos</option>
+                  <option value="bloqueados">Bloqueados</option>
+                </select>
               </div>
             </div>
           </div>
@@ -204,6 +195,9 @@ function Usuarios() {
                     </th>
                     <th className="px-6 py-4 text-left text-label-md text-on-surface-variant">
                       Permissão
+                    </th>
+                    <th className="px-6 py-4 text-left text-label-md text-on-surface-variant">
+                      Status
                     </th>
                     <th className="px-6 py-4 text-right text-label-md text-on-surface-variant">
                       Ações
@@ -233,17 +227,31 @@ function Usuarios() {
                           {roleLabel(u.role)}
                         </span>
                       </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-full uppercase ${isActiveStyle(
+                            u.is_active
+                          )}`}
+                        >
+                          <span className="material-symbols-outlined text-xs">
+                            {u.is_active ? 'check_circle' : 'block'}
+                          </span>
+                          {isActiveLabel(u.is_active)}
+                        </span>
+                      </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex justify-end gap-2 transition-opacity">
                           <button
                             type="button"
                             title="Editar"
+                            onClick={() => navigate(`/editar-usuario/${u.id}`)}
                             className="p-1.5 hover:bg-secondary-container/20 rounded text-on-surface-variant hover:text-secondary transition-all cursor-pointer"
                           >
                             <span className="material-symbols-outlined text-lg">
                               edit
                             </span>
                           </button>
+                          {canExclude() && (
                           <button
                             type="button"
                             title="Excluir"
@@ -254,6 +262,7 @@ function Usuarios() {
                               delete
                             </span>
                           </button>
+                          )}
                         </div>
                       </td>
                     </tr>

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'is_active'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -27,6 +27,32 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public const ROLE_ADMIN = 'administrador';
+    public const ROLE_GESTOR = 'gestor';
+    public const ROLE_COLABORADOR = 'colaborador';
+
+    public const ROLES = [
+        self::ROLE_ADMIN,
+        self::ROLE_GESTOR,
+        self::ROLE_COLABORADOR,
+    ];
+
+    public function effectiveRole(): string
+    {
+        $role = strtolower(trim((string) $this->role));
+
+        if (in_array($role, ['administrador', 'admin'], true)) {
+            return self::ROLE_ADMIN;
+        }
+
+        if (in_array($role, ['gestor', 'agente master'], true)) {
+            return self::ROLE_GESTOR;
+        }
+
+        return self::ROLE_COLABORADOR;
     }
 }

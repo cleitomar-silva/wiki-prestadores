@@ -10,7 +10,7 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - site-relacionamento-beneficiario_mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD-SHELL", "mysql -uroot -proot -e 'SELECT 1' >/dev/null 2>&1"]
       interval: 5s
@@ -54,4 +54,5 @@ services:
       - /app/node_modules
 
 volumes:
-  mysql_data:
+  site-relacionamento-beneficiario_mysql_data:
+    external: true

@@ -5,6 +5,10 @@ import Procedimentos from './pages/Procedimentos'
 import NovoProcedimento from './pages/NovoProcedimento'
 import EditarProcedimento from './pages/EditarProcedimento'
 import Usuarios from './pages/Usuarios'
+import CadastroUsuario from './pages/CadastroUsuario'
+import Perfil from './pages/Perfil'
+import EditarUsuario from './pages/EditarUsuario'
+import { canManageUsers } from './utils/permissions'
 import './App.css'
 
 function RequireAuth({ children }) {
@@ -15,12 +19,27 @@ function RequireAuth({ children }) {
   return children
 }
 
+function RequireAdmin({ children }) {
+  if (!canManageUsers()) {
+    return <Navigate to="/" replace />
+  }
+  return <RequireAuth>{children}</RequireAuth>
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<Home />} />
+        <Route
+          path="/perfil"
+          element={
+            <RequireAuth>
+              <Perfil />
+            </RequireAuth>
+          }
+        />
         <Route
           path="/procedimentos"
           element={
@@ -32,9 +51,25 @@ function App() {
         <Route
           path="/usuarios"
           element={
-            <RequireAuth>
+            <RequireAdmin>
               <Usuarios />
-            </RequireAuth>
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/novo-usuario"
+          element={
+            <RequireAdmin>
+              <CadastroUsuario />
+            </RequireAdmin>
+          }
+        />
+        <Route
+          path="/editar-usuario/:id"
+          element={
+            <RequireAdmin>
+              <EditarUsuario />
+            </RequireAdmin>
           }
         />
         <Route

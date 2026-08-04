@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppLayout from '../components/AppLayout'
 import Toast from '../components/Toast'
+import { canExclude } from '../utils/permissions'
 
 function Procedimentos() {
   const navigate = useNavigate()
@@ -196,6 +197,7 @@ function Procedimentos() {
                               edit
                             </span>
                           </button>
+                          {canExclude() && (
                           <button
                             type="button"
                             title="Excluir"
@@ -206,6 +208,7 @@ function Procedimentos() {
                               delete
                             </span>
                           </button>
+                          )}
                         </div>
                       </td>
                     </tr>
