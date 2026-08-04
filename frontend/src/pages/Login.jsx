@@ -148,7 +148,6 @@ function Login() {
       </main>
       <footer className="w-full py-base px-margin-desktop bg-surface-container-low border-t border-border-subtle flex flex-col md:flex-row justify-between items-center gap-4">
         <p className="text-body-sm text-on-surface-variant">
-          © 2026 WikiPrestadores Admin. Todos os direitos reservados.
         </p>        
       </footer>
     </div>

@@ -7,14 +7,14 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
     host: true,
-    port: 5173,
+    port: 5175,
     watch: {
       usePolling: true,
       interval: 300,
     },
     proxy: {
       '/api': {
-        target: process.env.VITE_BACKEND_URL || 'http://localhost:8080',
+        target: process.env.VITE_BACKEND_URL || 'http://localhost:9191',
         changeOrigin: true,
       },
     },

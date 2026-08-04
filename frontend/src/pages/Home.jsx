@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import AppLayout from '../components/AppLayout'
 
+function formatDate(value) {
+  if (!value) return ''
+  const [year, month, day] = value.split('-')
+  if (!year || !month || !day) return value
+  return `${day}/${month}/${year}`
+}
+
 function SearchForm({ onSearch, loading }) {
   const [provider, setProvider] = useState('')
   const [code, setCode] = useState('')
@@ -98,8 +105,15 @@ function EmptyState() {
   )
 }
 
-function ProcedureResult({ procedure, onReset }) {
-  const { provider, code, description, deadlines, operational_notes } = procedure
+function ProcedureResult({ procedure }) {
+  const {
+    provider,
+    code,
+    code_to_authorize,
+    description,
+    deadlines,
+    operational_notes,
+  } = procedure
 
   return (
     <div className="flex flex-col gap-6">
@@ -107,19 +121,11 @@ function ProcedureResult({ procedure, onReset }) {
         <h2 className="text-headline-md font-semibold text-primary">
           Resultado da Consulta
         </h2>
-        <button
-          type="button"
-          onClick={onReset}
-          className="text-secondary font-semibold flex items-center gap-1 hover:underline cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-sm">close</span>
-          Limpar
-        </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 tonal-layer-1 p-6 rounded bg-surface-container-lowest sidebar-accent">
           <div className="grid grid-cols-2 gap-y-6">
-            <div>
+            <div className="col-span-2">
               <p className="text-outline uppercase text-[11px] font-semibold mb-1">
                 Prestador
               </p>
@@ -132,6 +138,14 @@ function ProcedureResult({ procedure, onReset }) {
                 Código
               </p>
               <p className="text-headline-md font-bold text-primary">{code}</p>
+            </div>
+            <div>
+              <p className="text-outline uppercase text-[11px] font-semibold mb-1">
+                Código Autorizado
+              </p>
+              <p className="text-headline-md font-bold text-primary">
+                {code_to_authorize || '—'}
+              </p>
             </div>
             <div className="col-span-2">
               <p className="text-outline uppercase text-[11px] font-semibold mb-1">
@@ -156,13 +170,13 @@ function ProcedureResult({ procedure, onReset }) {
                 Ambulatorial
               </span>
               <span className="font-bold text-primary">
-                {deadlines.ambulatory}
+                {formatDate(deadlines.ambulatory)}
               </span>
             </div>
             <div className="flex justify-between items-end border-b border-outline-variant pb-2">
               <span className="text-on-surface-variant text-sm">Urgência</span>
               <span className="font-bold text-primary">
-                {deadlines.urgency}
+                {formatDate(deadlines.urgency)}
               </span>
             </div>
             <div className="flex justify-between items-end">
@@ -170,7 +184,7 @@ function ProcedureResult({ procedure, onReset }) {
                 Internação
               </span>
               <span className="font-bold text-primary">
-                {deadlines.hospitalization}
+                {formatDate(deadlines.hospitalization)}
               </span>
             </div>
           </div>
@@ -203,8 +217,7 @@ function Footer() {
   return (
     <footer className="w-full px-margin-desktop py-base flex justify-between items-center bg-surface-container-low text-on-surface-variant text-sm border-t border-border-subtle">
       <div className="flex flex-col md:flex-row md:items-center gap-4">
-        <span className="font-semibold text-primary">Wiki Prestadores</span>
-        <span>© 2026 WikiPrestadores Admin.</span>
+        
       </div>
      
     </footer>
@@ -247,13 +260,6 @@ function Home() {
     } finally {
       setLoading(false)
     }
-  }
-
-  const handleReset = () => {
-    setResults([])
-    setMessage('')
-    setSearched(false)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -305,7 +311,6 @@ function Home() {
                 <ProcedureResult
                   key={`${procedure.code}-${procedure.provider}`}
                   procedure={procedure}
-                  onReset={handleReset}
                 />
               ))}
           </section>
