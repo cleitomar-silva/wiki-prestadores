@@ -11,11 +11,11 @@ class Procedure extends Model
 
     protected $fillable = [
         'provider',
+        'cnpj',
         'code',
         'code_to_authorize',
         'description',
         'deadline_ambulatory',
-        'deadline_urgency',
         'deadline_hospitalization',
         'requires_justification',
         'authorization_coopanest',
@@ -25,7 +25,6 @@ class Procedure extends Model
     protected function casts(): array
     {
         return [
-            'deadline_urgency' => 'date',
             'requires_justification' => 'boolean',
             'authorization_coopanest' => 'boolean',
             'operational_notes' => 'array',
@@ -37,12 +36,12 @@ class Procedure extends Model
         return [
             'id' => $this->id,
             'provider' => $this->provider,
+            'cnpj' => $this->cnpj,
             'code' => $this->code,
             'code_to_authorize' => $this->code_to_authorize,
             'description' => $this->description,
             'deadlines' => [
                 'ambulatory' => $this->deadline_ambulatory,
-                'urgency' => $this->deadline_urgency?->format('Y-m-d') ?? '',
                 'hospitalization' => $this->deadline_hospitalization,
             ],
             'requires_justification' => $this->requires_justification,

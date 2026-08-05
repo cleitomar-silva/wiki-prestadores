@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import AppLayout from '../components/AppLayout'
+import { formatCnpj } from '../utils/cnpj'
 
 function formatDate(value) {
   if (!value) return ''
@@ -14,7 +15,7 @@ function SearchForm({ onSearch, loading }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSearch({ provider, code })
+    onSearch({ term: provider, code })
   }
 
   return (
@@ -37,7 +38,7 @@ function SearchForm({ onSearch, loading }) {
             <input
               className="w-full pl-10 pr-4 py-3 border border-outline-variant rounded focus:ring-2 focus:ring-primary focus:border-primary bg-surface transition-all"
               id="provider"
-              placeholder="Nome do Hospital ou Clínica"
+              placeholder="Nome do Hospital/Clínica ou CNPJ"
               type="text"
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
@@ -108,6 +109,7 @@ function EmptyState() {
 function ProcedureResult({ procedure }) {
   const {
     provider,
+    cnpj,
     code,
     code_to_authorize,
     description,
@@ -125,12 +127,20 @@ function ProcedureResult({ procedure }) {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 tonal-layer-1 p-6 rounded bg-surface-container-lowest sidebar-accent">
           <div className="grid grid-cols-2 gap-y-6">
-            <div className="col-span-2">
+            <div>
               <p className="text-outline uppercase text-[11px] font-semibold mb-1">
                 Prestador
               </p>
               <p className="text-headline-md font-semibold text-on-surface">
                 {provider}
+              </p>
+            </div>
+            <div>
+              <p className="text-outline uppercase text-[11px] font-semibold mb-1">
+                CNPJ
+              </p>
+              <p className="text-headline-md font-bold text-primary">
+                {formatCnpj(cnpj) || '—'}
               </p>
             </div>
             <div>
@@ -171,12 +181,6 @@ function ProcedureResult({ procedure }) {
               </span>
               <span className="font-bold text-primary">
                 {formatDate(deadlines.ambulatory)}
-              </span>
-            </div>
-            <div className="flex justify-between items-end border-b border-outline-variant pb-2">
-              <span className="text-on-surface-variant text-sm">Urgência</span>
-              <span className="font-bold text-primary">
-                {formatDate(deadlines.urgency)}
               </span>
             </div>
             <div className="flex justify-between items-end">
@@ -230,7 +234,7 @@ function Home() {
   const [message, setMessage] = useState('')
   const [searched, setSearched] = useState(false)
 
-  const handleSearch = async ({ provider, code }) => {
+  const handleSearch = async ({ term, code }) => {
     setLoading(true)
     setMessage('')
     setSearched(false)
@@ -238,7 +242,7 @@ function Home() {
 
     try {
       const params = new URLSearchParams()
-      if (provider) params.set('provider', provider)
+      if (term) params.set('term', term)
       if (code) params.set('code', code)
 
       const response = await fetch(`/api/procedures?${params.toString()}`, {

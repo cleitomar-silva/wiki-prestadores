@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import AppLayout from '../components/AppLayout'
 import Toast from '../components/Toast'
+import { maskCnpj } from '../utils/cnpj'
 
 const inputCls =
   'w-full border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary/20 rounded h-12 px-4 bg-surface-container-low/30'
@@ -12,11 +13,11 @@ function NovoProcedimento() {
   const navigate = useNavigate()
   const [form, setForm] = useState({
     provider: '',
+    cnpj: '',
     code: '',
     code_to_authorize: '',
     description: '',
     deadline_ambulatory: '',
-    deadline_urgency: '',
     deadline_hospitalization: '',
     justification: 'não',
     coopanest: 'sim',
@@ -53,11 +54,11 @@ function NovoProcedimento() {
         },
         body: JSON.stringify({
           provider: form.provider,
+          cnpj: form.cnpj,
           code: form.code,
           code_to_authorize: form.code_to_authorize,
           description: form.description,
           deadline_ambulatory: form.deadline_ambulatory,
-          deadline_urgency: form.deadline_urgency,
           deadline_hospitalization: form.deadline_hospitalization,
           requires_justification: form.justification === 'sim',
           authorization_coopanest: form.coopanest === 'sim',
@@ -70,7 +71,7 @@ function NovoProcedimento() {
       if (!response.ok) {
         const message = payload.errors
           ? Object.values(payload.errors).flat().join(' ')
-          : 'Não foi possível gravar o procedimento.'
+          : payload.message || 'Não foi possível gravar o procedimento.'
         pushToast('error', 'Erro ao gravar', message)
         return
       }
@@ -132,7 +133,7 @@ function NovoProcedimento() {
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
+              <div>
                 <label className={labelCls} htmlFor="provider">
                   Prestador
                 </label>
@@ -145,6 +146,23 @@ function NovoProcedimento() {
                   value={form.provider}
                   onChange={set('provider')}
                   required
+                />
+              </div>
+              <div>
+                <label className={labelCls} htmlFor="cnpj">
+                  CNPJ do Prestador
+                </label>
+                <input
+                  className={inputCls}
+                  id="cnpj"
+                  maxLength="18"
+                  placeholder="Ex: 12.345.678/0001-90"
+                  type="text"
+                  inputMode="numeric"
+                  value={form.cnpj}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, cnpj: maskCnpj(e.target.value) }))
+                  }
                 />
               </div>
               <div>
@@ -215,21 +233,6 @@ function NovoProcedimento() {
                     value={form.deadline_ambulatory}
                     onChange={set('deadline_ambulatory')}
                   />
-                </div>
-                <div>
-                  <label className={labelCls} htmlFor="deadline_urgency">
-                    Data Limite Entrega Coopanest
-                  </label>
-                  <div className="relative">
-                    <input
-                      className={`${inputCls} appearance-none`}
-                      id="deadline_urgency"
-                      type="date"
-                      value={form.deadline_urgency}
-                      onChange={set('deadline_urgency')}
-                    />
-                    
-                  </div>
                 </div>
                 <div>
                   <label className={labelCls} htmlFor="deadline_hospitalization">

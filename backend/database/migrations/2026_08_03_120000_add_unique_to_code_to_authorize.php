@@ -8,15 +8,13 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('procedures', function (Blueprint $table) {
-            $table->unique('code_to_authorize');
-        });
+        // Intencionalmente vazio: o código autorizado não é mais único.
     }
 
     public function down(): void
     {
         Schema::table('procedures', function (Blueprint $table) {
-            $table->dropUnique(['code_to_authorize']);
+            $table->unique('code_to_authorize');
         });
     }
 };

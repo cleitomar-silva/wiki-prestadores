@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AppLayout from '../components/AppLayout'
 import Toast from '../components/Toast'
+import { formatCnpj, maskCnpj } from '../utils/cnpj'
 
 const inputCls =
   'w-full border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary/20 rounded h-12 px-4 bg-surface-container-low/30'
@@ -17,11 +18,11 @@ function EditarProcedimento() {
   const [toasts, setToasts] = useState([])
   const [form, setForm] = useState({
     provider: '',
+    cnpj: '',
     code: '',
     code_to_authorize: '',
     description: '',
     deadline_ambulatory: '',
-    deadline_urgency: '',
     deadline_hospitalization: '',
     justification: 'não',
     coopanest: 'sim',
@@ -51,11 +52,11 @@ function EditarProcedimento() {
         const p = payload.data
         setForm({
           provider: p.provider ?? '',
+          cnpj: formatCnpj(p.cnpj) ?? '',
           code: p.code ?? '',
           code_to_authorize: p.code_to_authorize ?? '',
           description: p.description ?? '',
           deadline_ambulatory: p.deadlines?.ambulatory ?? '',
-          deadline_urgency: p.deadlines?.urgency ?? '',
           deadline_hospitalization: p.deadlines?.hospitalization ?? '',
           justification: p.requires_justification ? 'sim' : 'não',
           coopanest: p.authorization_coopanest ? 'sim' : 'não',
@@ -90,11 +91,11 @@ function EditarProcedimento() {
         },
         body: JSON.stringify({
           provider: form.provider,
+          cnpj: form.cnpj,
           code: form.code,
           code_to_authorize: form.code_to_authorize,
           description: form.description,
           deadline_ambulatory: form.deadline_ambulatory,
-          deadline_urgency: form.deadline_urgency,
           deadline_hospitalization: form.deadline_hospitalization,
           requires_justification: form.justification === 'sim',
           authorization_coopanest: form.coopanest === 'sim',
@@ -107,7 +108,7 @@ function EditarProcedimento() {
       if (!response.ok) {
         const message = payload.errors
           ? Object.values(payload.errors).flat().join(' ')
-          : 'Não foi possível atualizar o procedimento.'
+          : payload.message || 'Não foi possível atualizar o procedimento.'
         pushToast('error', 'Erro ao salvar', message)
         return
       }
@@ -205,7 +206,7 @@ function EditarProcedimento() {
               </h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
+              <div>
                 <label className={labelCls} htmlFor="provider">
                   Prestador
                 </label>
@@ -218,6 +219,23 @@ function EditarProcedimento() {
                   value={form.provider}
                   onChange={set('provider')}
                   required
+                />
+              </div>
+              <div>
+                <label className={labelCls} htmlFor="cnpj">
+                  CNPJ do Prestador
+                </label>
+                <input
+                  className={inputCls}
+                  id="cnpj"
+                  maxLength="18"
+                  placeholder="Ex: 12.345.678/0001-90"
+                  type="text"
+                  inputMode="numeric"
+                  value={form.cnpj}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, cnpj: maskCnpj(e.target.value) }))
+                  }
                 />
               </div>
               <div>
@@ -288,20 +306,6 @@ function EditarProcedimento() {
                     value={form.deadline_ambulatory}
                     onChange={set('deadline_ambulatory')}
                   />
-                </div>
-                <div>
-                  <label className={labelCls} htmlFor="deadline_urgency">
-                    Data Limite Entrega Coopanest
-                  </label>
-                  <div className="relative">
-                    <input
-                      className={`${inputCls} appearance-none`}
-                      id="deadline_urgency"
-                      type="date"
-                      value={form.deadline_urgency}
-                      onChange={set('deadline_urgency')}
-                    />
-                  </div>
                 </div>
                 <div>
                   <label className={labelCls} htmlFor="deadline_hospitalization">

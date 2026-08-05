@@ -8,12 +8,38 @@ use Illuminate\Http\Request;
 
 class ProcedureController extends Controller
 {
+    private function normalizeCnpj(?string $cnpj): ?string
+    {
+        if ($cnpj === null || trim($cnpj) === '') {
+            return null;
+        }
+
+        $digits = preg_replace('/\D/', '', $cnpj);
+
+        return $digits === '' ? null : $digits;
+    }
+
+    private function codeAndCnpjExists(string $code, ?string $cnpj, ?int $exceptId = null): bool
+    {
+        $query = Procedure::query()
+            ->where('code', $code)
+            ->when($exceptId !== null, fn ($q) => $q->where('id', '!=', $exceptId));
+
+        if ($cnpj === null) {
+            $query->whereNull('cnpj');
+        } else {
+            $query->where('cnpj', $cnpj);
+        }
+
+        return $query->exists();
+    }
+
     public function index(Request $request): JsonResponse
     {
-        $provider = trim((string) $request->query('provider'));
+        $term = trim((string) $request->query('term'));
         $code = trim((string) $request->query('code'));
 
-        if ($provider === '' && $code === '') {
+        if ($term === '' && $code === '') {
             return response()->json([
                 'data' => Procedure::query()
                     ->orderBy('provider')
@@ -25,8 +51,16 @@ class ProcedureController extends Controller
 
         $query = Procedure::query();
 
-        if ($provider !== '') {
-            $query->where('provider', 'like', "%{$provider}%");
+        if ($term !== '') {
+            $digits = preg_replace('/\D/', '', $term);
+
+            $query->where(function ($q) use ($term, $digits) {
+                $q->where('provider', 'like', "%{$term}%");
+
+                if ($digits !== '') {
+                    $q->orWhere('cnpj', $digits);
+                }
+            });
         }
 
         if ($code !== '') {
@@ -66,11 +100,11 @@ class ProcedureController extends Controller
     {
         $validated = $request->validate([
             'provider' => ['required', 'string', 'max:150'],
-            'code' => ['required', 'string', 'max:50', 'unique:procedures,code'],
-            'code_to_authorize' => ['nullable', 'string', 'max:50', 'unique:procedures,code_to_authorize'],
+            'cnpj' => ['nullable', 'string', 'regex:/^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{14})$/'],
+            'code' => ['required', 'string', 'max:50'],
+            'code_to_authorize' => ['nullable', 'string', 'max:50'],
             'description' => ['required', 'string', 'max:255'],
             'deadline_ambulatory' => ['nullable', 'string', 'max:50'],
-            'deadline_urgency' => ['nullable', 'date'],
             'deadline_hospitalization' => ['nullable', 'string', 'max:100'],
             'requires_justification' => ['nullable', 'boolean'],
             'authorization_coopanest' => ['nullable', 'boolean'],
@@ -78,13 +112,21 @@ class ProcedureController extends Controller
             'operational_notes.*' => ['string'],
         ]);
 
+        $cnpj = $this->normalizeCnpj($validated['cnpj'] ?? null);
+
+        if ($this->codeAndCnpjExists($validated['code'], $cnpj)) {
+            return response()->json([
+                'message' => 'Já existe um procedimento com este código para o mesmo CNPJ do prestador. O código só pode ser repetido para CNPJ diferentes.',
+            ], 422);
+        }
+
         $procedure = Procedure::create([
             'provider' => $validated['provider'],
+            'cnpj' => $cnpj,
             'code' => $validated['code'],
             'code_to_authorize' => $validated['code_to_authorize'] ?? null,
             'description' => $validated['description'],
             'deadline_ambulatory' => $validated['deadline_ambulatory'] ?? '',
-            'deadline_urgency' => $validated['deadline_urgency'] ?? null,
             'deadline_hospitalization' => $validated['deadline_hospitalization'] ?? '',
             'requires_justification' => $validated['requires_justification'] ?? false,
             'authorization_coopanest' => $validated['authorization_coopanest'] ?? true,
@@ -108,11 +150,11 @@ class ProcedureController extends Controller
 
         $validated = $request->validate([
             'provider' => ['required', 'string', 'max:150'],
-            'code' => ['required', 'string', 'max:50', "unique:procedures,code,{$id}"],
-            'code_to_authorize' => ['nullable', 'string', 'max:50', "unique:procedures,code_to_authorize,{$id}"],
+            'cnpj' => ['nullable', 'string', 'regex:/^(\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}|\d{14})$/'],
+            'code' => ['required', 'string', 'max:50'],
+            'code_to_authorize' => ['nullable', 'string', 'max:50'],
             'description' => ['required', 'string', 'max:255'],
             'deadline_ambulatory' => ['nullable', 'string', 'max:50'],
-            'deadline_urgency' => ['nullable', 'date'],
             'deadline_hospitalization' => ['nullable', 'string', 'max:100'],
             'requires_justification' => ['nullable', 'boolean'],
             'authorization_coopanest' => ['nullable', 'boolean'],
@@ -120,13 +162,21 @@ class ProcedureController extends Controller
             'operational_notes.*' => ['string'],
         ]);
 
+        $cnpj = $this->normalizeCnpj($validated['cnpj'] ?? null);
+
+        if ($this->codeAndCnpjExists($validated['code'], $cnpj, $id)) {
+            return response()->json([
+                'message' => 'Já existe um procedimento com este código para o mesmo CNPJ do prestador. O código só pode ser repetido para CNPJ diferentes.',
+            ], 422);
+        }
+
         $procedure->update([
             'provider' => $validated['provider'],
+            'cnpj' => $cnpj,
             'code' => $validated['code'],
             'code_to_authorize' => $validated['code_to_authorize'] ?? null,
             'description' => $validated['description'],
             'deadline_ambulatory' => $validated['deadline_ambulatory'] ?? '',
-            'deadline_urgency' => $validated['deadline_urgency'] ?? null,
             'deadline_hospitalization' => $validated['deadline_hospitalization'] ?? '',
             'requires_justification' => $validated['requires_justification'] ?? false,
             'authorization_coopanest' => $validated['authorization_coopanest'] ?? true,

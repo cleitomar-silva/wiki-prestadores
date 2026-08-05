@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('procedures', function (Blueprint $table) {
             $table->id();
             $table->string('provider', 150);
-            $table->string('code', 50)->unique();
+            $table->string('code', 50);
             $table->text('description');
             $table->string('deadline_ambulatory', 50);
             $table->date('deadline_urgency')->nullable();

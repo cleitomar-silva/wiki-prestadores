@@ -20,7 +20,9 @@ COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 COPY docker/wait-for-db.php /usr/local/bin/wait-for-db.php
 
-RUN composer install --no-interaction --prefer-dist --no-progress --no-scripts \
+RUN composer install --no-interaction --prefer-dist --no-progress --no-dev --no-scripts \
+    && rm -f bootstrap/cache/packages.php bootstrap/cache/services.php \
+    && php artisan package:discover --ansi \
     && chmod +x /usr/local/bin/docker-entrypoint \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 

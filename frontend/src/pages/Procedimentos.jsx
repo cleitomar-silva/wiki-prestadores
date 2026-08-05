@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import AppLayout from '../components/AppLayout'
 import Toast from '../components/Toast'
 import { canExclude } from '../utils/permissions'
+import { formatCnpj } from '../utils/cnpj'
 
 function Procedimentos() {
   const navigate = useNavigate()
@@ -79,9 +80,11 @@ function Procedimentos() {
 
   const filtered = procedures.filter((p) => {
     const q = term.toLowerCase()
+    const cnpjDigits = term.replace(/\D/g, '')
     if (!q) return true
     return (
       p.provider.toLowerCase().includes(q) ||
+      (cnpjDigits && p.cnpj === cnpjDigits) ||
       p.code.toLowerCase().includes(q) ||
       p.description.toLowerCase().includes(q)
     )
@@ -152,6 +155,9 @@ function Procedimentos() {
                       Prestador
                     </th>
                     <th className="px-6 py-4 text-left text-label-md text-on-surface-variant">
+                      CNPJ
+                    </th>
+                    <th className="px-6 py-4 text-left text-label-md text-on-surface-variant">
                       Código
                     </th>
                     <th className="px-6 py-4 text-left text-label-md text-on-surface-variant">
@@ -171,6 +177,11 @@ function Procedimentos() {
                       <td className="px-6 py-4">
                         <span className="text-sm font-semibold text-primary">
                           {p.provider}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-mono text-xs text-on-surface">
+                          {formatCnpj(p.cnpj) || '—'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
