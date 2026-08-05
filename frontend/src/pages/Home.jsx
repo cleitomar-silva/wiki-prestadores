@@ -113,6 +113,7 @@ function ProcedureResult({ procedure }) {
     code,
     code_to_authorize,
     description,
+    requires_justification,
     deadlines,
     operational_notes,
   } = procedure
@@ -157,6 +158,14 @@ function ProcedureResult({ procedure }) {
                 {code_to_authorize || '—'}
               </p>
             </div>
+            <div>
+              <p className="text-outline uppercase text-[11px] font-semibold mb-1">
+                Precisa de Justificativa?
+              </p>
+              <p className="text-headline-md font-bold text-primary">
+                {requires_justification ? 'Sim' : 'Não'}
+              </p>
+            </div>
             <div className="col-span-2">
               <p className="text-outline uppercase text-[11px] font-semibold mb-1">
                 Descrição
@@ -177,7 +186,7 @@ function ProcedureResult({ procedure }) {
           <div className="space-y-4">
             <div className="flex justify-between items-end border-b border-outline-variant pb-2">
               <span className="text-on-surface-variant text-sm">
-                Ambulatorial
+                Prazo Apresentação Conta
               </span>
               <span className="font-bold text-primary">
                 {formatDate(deadlines.ambulatory)}
@@ -185,7 +194,7 @@ function ProcedureResult({ procedure }) {
             </div>
             <div className="flex justify-between items-end">
               <span className="text-on-surface-variant text-sm">
-                Internação
+                Formato de Entrega
               </span>
               <span className="font-bold text-primary">
                 {formatDate(deadlines.hospitalization)}

@@ -252,60 +252,31 @@ function NovoProcedimento() {
             </div>
           </div>
 
-          <div className="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-surface-container-lowest border border-border-subtle rounded p-6 flex flex-col justify-center">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-error-container/20 rounded text-error">
-                    <span className="material-symbols-outlined">
-                      priority_high
-                    </span>
-                  </div>
-                  <label
-                    className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold"
-                    htmlFor="justification"
-                  >
-                    Precisa de justificativa?
-                  </label>
+          <div className="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-border-subtle rounded p-6 flex flex-col justify-center">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-error-container/20 rounded text-error">
+                  <span className="material-symbols-outlined">
+                    priority_high
+                  </span>
                 </div>
-                <select
-                  className="border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary/20 rounded h-10 px-4 min-w-[100px]"
-                  id="justification"
-                  value={form.justification}
-                  onChange={set('justification')}
+                <label
+                  className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold"
+                  htmlFor="justification"
                 >
-                  <option value="não">Não</option>
-                  <option value="sim">Sim</option>
-                </select>
+                  Precisa de justificativa?
+                </label>
               </div>
+              <select
+                className="border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary/20 rounded h-10 px-4 min-w-[100px]"
+                id="justification"
+                value={form.justification}
+                onChange={set('justification')}
+              >
+                <option value="não">Não</option>
+                <option value="sim">Sim</option>
+              </select>
             </div>
-            <div className="bg-surface-container-lowest border border-border-subtle rounded p-6 flex flex-col justify-center">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-secondary-container/20 rounded text-secondary">
-                    <span className="material-symbols-outlined">
-                      business_center
-                    </span>
-                  </div>
-                  <label
-                    className="text-xs text-on-surface-variant uppercase tracking-wider font-semibold"
-                    htmlFor="coopanest"
-                  >
-                    Autorização em nome da Coopanest?
-                  </label>
-                </div>
-                <select
-                  className="border border-border-subtle focus:border-primary focus:ring-1 focus:ring-primary/20 rounded h-10 px-4 min-w-[100px]"
-                  id="coopanest"
-                  value={form.coopanest}
-                  onChange={set('coopanest')}
-                >
-                  <option value="sim">Sim</option>
-                  <option value="não">Não</option>
-                </select>
-              </div>
-            </div>
-            
           </div>
 
           <div className="col-span-12 bg-surface-container-lowest border border-border-subtle rounded p-6">
